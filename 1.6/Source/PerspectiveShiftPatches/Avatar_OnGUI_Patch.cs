@@ -40,16 +40,21 @@ namespace PerspectiveShiftExpanded
         public static void Postfix(object __instance)
         {
             HandleReadingBinding();
+            HandleSelectAvatarBindings();
         }
 
         private static void HandleReadingBinding()
         {
-            if (!DefsOf.PSE_ReadBook.KeyDownEvent) { 
-                return; }
-            if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused) {
-                return; }
-            Pawn pawn = GetFromPerspectiveShift.GetPawn();
-            if (pawn?.inventory == null) 
+            if (!DefsOf.PSE_ReadBook.KeyDownEvent)
+            {
+                return;
+            }
+            if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused)
+            {
+                return;
+            }
+            Pawn pawn = GetFromPerspectiveShift.GetAvatarPawn();
+            if (pawn?.inventory == null)
             {
                 return;
             }
@@ -70,6 +75,21 @@ namespace PerspectiveShiftExpanded
 
             Job readingJob = JobMaker.MakeJob(DefsOf.PSE_AvatarReading, book);
             bool try_readingJob = pawn.jobs.TryTakeOrderedJob(readingJob, JobTag.Idle);
+        }
+
+        private static void HandleSelectAvatarBindings()
+        {
+            if (!DefsOf.PSE_SelectAvatar.KeyDownEvent)
+            {
+                return;
+            }
+            Pawn pawn = GetFromPerspectiveShift.GetAvatarPawn();
+            if (pawn != null && pawn.Spawned)
+            {
+                Find.Selector.ClearSelection();
+                Find.Selector.Select(pawn);
+                CameraJumper.TryJump(pawn);
+            }
         }
     }
 }

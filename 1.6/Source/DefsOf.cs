@@ -7,6 +7,7 @@ namespace PerspectiveShiftExpanded
     public static class DefsOf
     {
         public static KeyBindingDef PSE_ReadBook;
+        public static KeyBindingDef PSE_SelectAvatar;
         public static JobDef PSE_AvatarReading;
         static DefsOf()
         {

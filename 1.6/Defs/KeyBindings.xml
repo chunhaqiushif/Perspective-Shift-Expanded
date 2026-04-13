@@ -12,4 +12,11 @@
         <category>PSE_Controls</category>
         <defaultKeyCodeA>B</defaultKeyCodeA>
     </KeyBindingDef>
+
+    <KeyBindingDef>
+        <defName>PSE_SelectAvatar</defName>
+        <label>Select Avatar</label>
+        <category>PSE_Controls</category>
+        <defaultKeyCodeA>Q</defaultKeyCodeA>
+    </KeyBindingDef>
 </Defs>

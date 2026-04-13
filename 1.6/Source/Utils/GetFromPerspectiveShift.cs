@@ -23,7 +23,7 @@ namespace PerspectiveShiftExpanded
         /// <summary>
         /// 获取 PerspectiveShift.Avatar.pawn
         /// </summary>
-        public static Pawn GetPawn()
+        public static Pawn GetAvatarPawn()
         {
             if (AvatarInstanceField == null || PawnField == null) return null;
             try
