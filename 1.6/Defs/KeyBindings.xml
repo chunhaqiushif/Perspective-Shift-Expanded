@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <KeyBindingCategoryDef>
+        <defName>PSE_Controls</defName>
+        <label>Perspective Shift Expanded</label>
+        <description>Controls for direct character control.</description>
+    </KeyBindingCategoryDef>
+
+    <KeyBindingDef>
+        <defName>PSE_ReadBook</defName>
+        <label>Read Book</label>
+        <category>PSE_Controls</category>
+        <defaultKeyCodeA>B</defaultKeyCodeA>
+    </KeyBindingDef>
+</Defs>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <PS_EnableJobsTimeSpeedUp>Enable do jobs time speed up</PS_EnableJobsTimeSpeedUp>
+    <PS_JobsTimeSpeedUpLevel>Jobs time speed: {0}x</PS_JobsTimeSpeedUpLevel>
+    <PS_EnableMineTimeSpeedUp>Mine</PS_EnableMineTimeSpeedUp>
+    <PS_EnablePlantTimeSpeedUp>Plant</PS_EnablePlantTimeSpeedUp>
+    <PS_EnableResearchTimeSpeedUp>Research</PS_EnableResearchTimeSpeedUp>
+    <PS_EnableDoBillTimeSpeedUp>Do bill</PS_EnableDoBillTimeSpeedUp>
+    <PS_EnableDoFrameAndRepairTimeSpeedUp>Do frame and repair</PS_EnableDoFrameAndRepairTimeSpeedUp>
+    <PS_EnableRestTimeSpeedUp>Rest</PS_EnableRestTimeSpeedUp>
+    <PS_EnableReadBookTimeSpeedUp>Read book</PS_EnableReadBookTimeSpeedUp>
+    <PS_EnableMeditatePrayTimeSpeedUp>Meditate Pray</PS_EnableMeditatePrayTimeSpeedUp>
+</LanguageData>

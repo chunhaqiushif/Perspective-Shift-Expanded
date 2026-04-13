@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ModMetaData>
+    <name>Perspective Shift Expanded</name>
+    <author>Tupler</author>
+    <packageId>Tupler.PerspectiveShiftExpanded</packageId>
+    <description>Play as your characters. (Add some features I wanted)</description>
+    <supportedVersions>
+        <li>1.6</li>
+    </supportedVersions>
+    <loadAfter>
+        <li>Ludeon.RimWorld</li>
+        <li>Ludeon.RimWorld.Royalty</li>
+        <li>Ludeon.RimWorld.Ideology</li>
+        <li>Ludeon.RimWorld.Biotech</li>
+        <li>Ludeon.RimWorld.Anomaly</li>
+        <li>Ludeon.RimWorld.Odyssey</li>
+        <li>brrainz.harmony</li>
+        <li>ferny.PerspectiveShift</li>
+    </loadAfter>
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+			<steamWorkshopUrl>https://steamcommunity.com/workshop/filedetails/?id=2009463077</steamWorkshopUrl>
+		</li>
+		<li>
+			<packageId>ray1203.simplecamerasetting</packageId>
+			<displayName>SimpleCameraSetting</displayName>
+			<steamWorkshopUrl>https://steamcommunity.com/workshop/filedetails/?id=3232415388</steamWorkshopUrl>
+		</li>
+		<li>
+			<packageId>ferny.PerspectiveShift</packageId>
+			<displayName>PerspectiveShift</displayName>
+			<steamWorkshopUrl>https://steamcommunity.com/workshop/filedetails/?id=3686618980</steamWorkshopUrl>
+		</li>
+	</modDependencies>
+    <incompatibleWith>
+        <li>addvans.wasdedpawn</li>
+        <li>brrainz.cameraplus</li>
+    </incompatibleWith>
+</ModMetaData>
