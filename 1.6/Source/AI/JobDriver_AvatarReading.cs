@@ -39,12 +39,24 @@ namespace PerspectiveShiftExpanded
 
         public override void Notify_Starting()
         {
+            if (pawn != null && pawn.Drafted)
+            {
+                Log.Message($"[PerspectiveShiftExpanded] {pawn.NameShortColored} 处于征召状态，取消阅读任务。");
+                pawn.jobs.EndCurrentJob(JobCondition.Incompletable);
+                // TODO: 此处提示文本需要新增(这里是临时拼起来的)
+                Messages.Message("ShowWeapons_WhileDrafted".Translate() + "CannotUseGizmoMouse".Translate(), MessageTypeDefOf.RejectInput, false);
+                return;
+            }
+
+            if (pawn != null && pawn.CurJob != job)
+            {
+                pawn.jobs.StopAll();
+            }
+
             base.Notify_Starting();
 
             job.count = 1;
-
             hasInInventory = pawn.inventory != null && pawn.inventory.Contains(Book);
-
             carrying = pawn?.carryTracker.CarriedThing == Book;
 
             isLearningDesire = pawn?.learning != null &&

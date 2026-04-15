@@ -6,6 +6,9 @@ using UnityEngine;
 using Verse;
 using Verse.AI;
 
+// 当角色为化身(Avatar)时，跳过 CE 的原始检查逻辑，避免玩家角色进入自动换弹
+// ModCompatibility: CE
+
 namespace PerspectiveShiftExpanded
 {
     [StaticConstructorOnStartup]
@@ -13,6 +16,7 @@ namespace PerspectiveShiftExpanded
     {
         static CE_JobGiver_CheckReload_TryGiveJob_HarmonyManualPatches()
         {
+            if (!ModCompatibility.CombatExpanded) { return; }
             if (ModCompatibility.PSE_CE_JobGiver_CheckReload_TryGiveJobMethod == null) { return; }
 
             MethodInfo myPrefix = AccessTools.Method(
@@ -29,14 +33,10 @@ namespace PerspectiveShiftExpanded
         }
     }
 
-    /// <summary>
-    /// 当角色为化身(Avatar)时，跳过 CE 的原始检查逻辑，避免玩家角色进入自动换弹
-    /// </summary>
     public static class CE_JobGiver_CheckReload_TryGiveJob_Patch
     {
         public static bool Prefix(object __instance, Pawn pawn, ref Job __result)
         {
-            //TODO:可能需要设置个开关
             if (pawn == null) { return true; }
             if (ModCompatibility.PSE_PS_State_IsAvatar(pawn))
             {

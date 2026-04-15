@@ -9,16 +9,20 @@ using UnityEngine;
 using Verse;
 using Verse.AI;
 
+// 当化身(Avatar)执行换弹工作时,使用此处的移动速度计算方式
+// TODO: 目前会和CE抢优先级不生效
+// ModCompatibility: PS && CE
+
 namespace PerspectiveShiftExpanded
 {
     [HarmonyPatch(typeof(Pawn), nameof(Pawn.TicksPerMove))]
     public static class Pawn_TicksPerMove_Patch
     {
-
         public static bool Prefix(Pawn __instance, ref float __result, bool diagonal)
         {
             if (!ModCompatibility.CombatExpanded) { return true; }
-            
+            if (!ModCompatibility.PerspectiveShift) { return true; }
+
             if (!__instance.PSE_PS_State_IsAvatar()) { return true; }
 
             if (ModCompatibility.PSE_CE_CE_JobDefOfType == null) { return true; }

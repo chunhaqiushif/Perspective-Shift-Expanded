@@ -5,6 +5,9 @@ using System.Reflection;
 using Verse;
 using Verse.AI;
 
+// 当化身(Avatar)结束当前工作时,重置时间加速状态
+// ModCompatibility: PS
+
 namespace PerspectiveShiftExpanded
 {
     public class JobStateSnapshot
@@ -20,6 +23,8 @@ namespace PerspectiveShiftExpanded
     {
         public static void Prefix(Pawn_JobTracker __instance, out JobStateSnapshot __state)
         {
+            if(!ModCompatibility.PerspectiveShift) { __state = null; return ; }
+
             __state = new JobStateSnapshot();
             if (__instance.curJob == null) { return; }
 

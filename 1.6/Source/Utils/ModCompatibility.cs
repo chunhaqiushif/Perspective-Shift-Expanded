@@ -15,6 +15,7 @@ namespace PerspectiveShiftExpanded
     {
         // MOD 兼容性检查
         public static bool CombatExpanded => ModsConfig.IsActive("CETeam.CombatExtended");
+        public static bool PerspectiveShift => ModsConfig.IsActive("ferny.PerspectiveShift");
 
         // Perspective Shift -> PSE_PS
         public static readonly Type PSE_PS_AvatarType = AccessTools.TypeByName("PerspectiveShift.Avatar");

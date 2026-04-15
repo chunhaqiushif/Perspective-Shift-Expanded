@@ -8,6 +8,12 @@ using System.Threading.Tasks;
 using Verse;
 using Verse.AI;
 
+// 当持有者为化身(Avatar)时,拦截除例外情况的所有换弹操作
+// 例外情况: 
+// 1.设置中禁用了拦截(settings.enableAvatarAutoReload == true);
+// 2.临时允许换弹(isAvatarAllowToReload == true);
+// ModCompatibility: CE && PS
+
 namespace PerspectiveShiftExpanded
 {
     [StaticConstructorOnStartup]
@@ -15,6 +21,8 @@ namespace PerspectiveShiftExpanded
     {
         static CE_CompAmmoUser_TryStartReload_HarmonyManualPatches()
         {
+            if (!ModCompatibility.CombatExpanded) { return; }
+            if (!ModCompatibility.PerspectiveShift) { return; }
             if (ModCompatibility.PSE_CE_CompAmmoUser_TryStartReloadMethod == null) { return; }
 
             MethodInfo myPrefix = AccessTools.Method(
@@ -31,12 +39,7 @@ namespace PerspectiveShiftExpanded
         }
     }
 
-    /// <summary>
-    /// 当持有者为化身时,拦截除例外情况的所有换弹操作
-    /// <br/>例外情况: 
-    /// <br/>1.设置中禁用了拦截(settings.enableAvatarAutoReload == true);
-    /// <br/>2.临时允许换弹(isAvatarAllowToReload == true);
-    /// </summary>
+
     public static class CE_CompAmmoUser_TryStartReload_Patch
     {
 

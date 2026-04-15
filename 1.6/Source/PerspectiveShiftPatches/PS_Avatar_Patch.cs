@@ -10,6 +10,9 @@ using UnityEngine;
 using Verse;
 using Verse.AI;
 
+// 1. 化身(Avatar)的按键绑定监控: 换弹\阅读\选中单位等功能
+// 2. 化身进行ProcessMovement 移动时防止其中断部分操作(比如换弹)
+// ModCompatibility: CE && PS
 
 namespace PerspectiveShiftExpanded
 {
@@ -18,6 +21,9 @@ namespace PerspectiveShiftExpanded
     {
         static PS_Avatar_OnGUI_HarmonyManualPatches()
         {
+            if (!ModCompatibility.CombatExpanded) { return; }
+            if (!ModCompatibility.PerspectiveShift) { return; }
+
             Type avatarType = AccessTools.TypeByName("PerspectiveShift.Avatar");
             if (avatarType == null) return;
 
@@ -271,7 +277,7 @@ namespace PerspectiveShiftExpanded
                                 codes[k].operand = null;
                             }
 
-                            Log.Message("[PSE] 已物理移除 moveInputDuration 比较链条");
+                            Log.Message("[PerspectiveShiftExpanded] 已移除 PerspectiveShift.Avatar.ProcessMovement的moveInputDuration 比较代码");
                             return codes;
                         }
                     }
