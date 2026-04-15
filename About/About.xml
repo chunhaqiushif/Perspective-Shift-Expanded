@@ -16,6 +16,7 @@
         <li>Ludeon.RimWorld.Odyssey</li>
         <li>brrainz.harmony</li>
         <li>ferny.PerspectiveShift</li>
+        <li>CETeam.CombatExtended</li>
     </loadAfter>
 	<modDependencies>
 		<li>

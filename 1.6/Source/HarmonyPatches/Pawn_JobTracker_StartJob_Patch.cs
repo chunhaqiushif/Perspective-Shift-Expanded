@@ -16,10 +16,9 @@ namespace PerspectiveShiftExpanded
         public static void Postfix(Pawn_JobTracker __instance, Job newJob)
         {
             Pawn pawn = __instance.pawn;
-            if (pawn == null || !GetFromPerspectiveShift.IsAvatar(pawn)) { return; }
+            if (pawn == null || !ModCompatibility.PSE_PS_State_IsAvatar(pawn)) { return; }
             if (newJob == null || newJob.def == null) { return; }
             JobDefsNeedTimeSpeedUp.SetTimeSpeedByJobDef(newJob.def);
-            Log.Message(newJob.def.defName);
         }
     }
 }

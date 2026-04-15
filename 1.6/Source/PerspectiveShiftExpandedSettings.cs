@@ -16,6 +16,7 @@ namespace PerspectiveShiftExpanded
         public bool enableReadBookTimeSpeedUp = true;
         public bool enableMeditatePrayTimeSpeedUp = true;
         public TimeSpeed timeSpeedPawnAvatarBeforeWork = TimeSpeed.Normal;
+        public bool enableAvatarAutoReload = false;
 
         public override void ExposeData()
         {

@@ -70,9 +70,7 @@ namespace PerspectiveShiftExpanded
             { return; }
 
             settings.timeSpeedPawnAvatarBeforeWork = Find.TickManager.curTimeSpeed;
-            Log.Message("save ->" + (float)settings.timeSpeedPawnAvatarBeforeWork);
             Find.TickManager.curTimeSpeed = (TimeSpeed)settings.jobsTimeSpeedUpLevel;
-            Log.Message("to ->" + Find.TickManager.curTimeSpeed);
         }
 
         public static void ResetTimeSpeed(JobDef jobDef)

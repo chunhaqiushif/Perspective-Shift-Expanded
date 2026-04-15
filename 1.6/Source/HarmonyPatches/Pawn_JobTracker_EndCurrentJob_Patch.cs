@@ -29,7 +29,7 @@ namespace PerspectiveShiftExpanded
             __state.playerForced = __instance.curJob.playerForced;
             __state.targetA = __instance.curJob.targetA;
 
-            if (GetFromPerspectiveShift.IsAvatar(__instance.pawn))
+            if (ModCompatibility.PSE_PS_State_IsAvatar(__instance.pawn))
             {
                 JobDefsNeedTimeSpeedUp.ResetTimeSpeed(__state.def);
             }

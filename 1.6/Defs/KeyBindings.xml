@@ -19,4 +19,11 @@
         <category>PSE_Controls</category>
         <defaultKeyCodeA>Q</defaultKeyCodeA>
     </KeyBindingDef>
+
+    <KeyBindingDef>
+        <defName>PSE_CE_AvatarReload</defName>
+        <label>Reload (Shift + Key)</label>
+        <category>PSE_Controls</category>
+        <defaultKeyCodeA>R</defaultKeyCodeA>
+    </KeyBindingDef>
 </Defs>
