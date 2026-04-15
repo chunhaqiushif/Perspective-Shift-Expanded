@@ -176,12 +176,9 @@ namespace PerspectiveShiftExpanded
             // 假设通过其一中的结构，avatarInstance 内部有 pawn 字段
             var pawnField = AccessTools.Field(avatarInstance.GetType(), "pawn");
             Pawn pawn = pawnField?.GetValue(avatarInstance) as Pawn;
-            Log.Message($"PreventInterruptJobs.Contains(curJob.def)={PreventInterruptJobs.Contains(curJob.def)}");
             // 2. 判断是否在免中断列表中
             if (pawn != null && curJob != null && PreventInterruptJobs.Contains(curJob.def))
             {
-                Log.Message($"[PSE]不中断: {curJob.def}");
-                Log.Message($"==========================================================");
                 return true; // 触发拦截
             }
 
