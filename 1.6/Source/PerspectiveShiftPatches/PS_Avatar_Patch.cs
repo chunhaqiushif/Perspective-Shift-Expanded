@@ -1,4 +1,5 @@
 using HarmonyLib;
+using NAudio.SoundFont;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -136,6 +137,8 @@ namespace PerspectiveShiftExpanded
         static PS_Avatar_ProcessMovement_HarmonyManualPatches()
         {
             if (ModCompatibility.PSE_PS_Avatar_ProcessMovementMethod == null) { return; }
+            // 需要兼容CE
+            if (!ModCompatibility.CombatExpanded) { return; }
 
             MethodInfo myTranspiler = AccessTools.Method(
                 typeof(PS_Avatar_ProcessMovement_Patch),
@@ -152,90 +155,130 @@ namespace PerspectiveShiftExpanded
     }
     public static class PS_Avatar_ProcessMovement_Patch
     {
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            return PS_Avatar_ProcessMovement_Transpiler.DoTranspile(instructions);
+            var codes = PS_Avatar_ProcessMovement_Transpiler.DoTranspile_PreventInterruptJobs(instructions, generator);
+            return PS_Avatar_ProcessMovement_Transpiler.DoTranspile_RemoveInterruptDelay(codes);
+
         }
     }
-
     public static class PS_Avatar_ProcessMovement_Transpiler
     {
-        /// <summary>
-        /// 不会被移动中断的Job列表
-        /// </summary>
         private static List<JobDef> PreventInterruptJobs = new List<JobDef>
         {
-            //DefsOf.PSE_AvatarReading,
-            ModCompatibility.PSE_CE_GET_CE_JobDefOf_ReloadWeapon()
-
+            ModCompatibility.PSE_CE_GET_CE_JobDefOf_ReloadWeapon(),
         };
-        private static void Injected_SelectivePreventInterruptJobs(object avatarInstance, Job currentJob, Pawn pawn)
-        {
-            if (avatarInstance == null || currentJob== null) return;
 
-            if (PreventInterruptJobs.Contains(currentJob.def))
+        // 逻辑：如果 RunAndGun 激活，或者是我们列表中的 Job，则返回 true
+        public static bool Wrap_HandleAbilityCancellation(object avatarInstance, Job curJob)
+        {
+            // 1. 获取 pawn 实例
+            // 假设通过其一中的结构，avatarInstance 内部有 pawn 字段
+            var pawnField = AccessTools.Field(avatarInstance.GetType(), "pawn");
+            Pawn pawn = pawnField?.GetValue(avatarInstance) as Pawn;
+            Log.Message($"PreventInterruptJobs.Contains(curJob.def)={PreventInterruptJobs.Contains(curJob.def)}");
+            // 2. 判断是否在免中断列表中
+            if (pawn != null && curJob != null && PreventInterruptJobs.Contains(curJob.def))
             {
-                // 化身正在执行某些特殊Job时中断原版操作
-                return;
+                Log.Message($"[PSE]不中断: {curJob.def}");
+                Log.Message($"==========================================================");
+                return true; // 触发拦截
             }
-            ModCompatibility.PSE_PS_Avatar_HandleAbilityCancellationMethod.Invoke(avatarInstance, new object[] { currentJob });
-            pawn?.jobs?.EndCurrentJob(JobCondition.InterruptForced);
+
+            // 3. 否则执行原有的 HandleAbilityCancellation
+            // 使用反射调用其三中的私有方法
+            var originalMethod = AccessTools.Method(avatarInstance.GetType(), "HandleAbilityCancellation", new[] { typeof(Job) });
+            originalMethod?.Invoke(avatarInstance, new object[] { curJob });
+
+            return false; // 继续执行后续逻辑（即 EndCurrentJob）
         }
 
-        /// <summary>
-        /// 注入代码, 增加Avatar在移动时的中断Job条件, 以实现移动中不打断某些特殊Job(如换弹\读书)的效果
-        /// </summary>
-        public static IEnumerable<CodeInstruction> DoTranspile(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> DoTranspile_PreventInterruptJobs(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             var codes = instructions.ToList();
-            var targetMethod = ModCompatibility.PSE_PS_Avatar_HandleAbilityCancellationMethod;
-            var replacement = AccessTools.Method(typeof(PS_Avatar_ProcessMovement_Transpiler), nameof(Injected_SelectivePreventInterruptJobs));
+
+            // 获取原方法引用 (其三)
+            var avatarType = ModCompatibility.PSE_PS_AvatarType;
+            var originalCancelMethod = ModCompatibility.PSE_PS_Avatar_HandleAbilityCancellationMethod;
+
+            // 获取 EndCurrentJob 引用
             var endJobMethod = AccessTools.Method(typeof(Pawn_JobTracker), nameof(Pawn_JobTracker.EndCurrentJob));
 
-            if (targetMethod == null) return instructions;
-
-            bool found = false;
             for (int i = 0; i < codes.Count; i++)
             {
-                // 找到 HandleAbilityCancellation 的位置
-                if ((codes[i].opcode == OpCodes.Callvirt || codes[i].opcode == OpCodes.Call) &&
-                    codes[i].operand is MethodInfo mi && mi == targetMethod)
+                // 步骤 A: 找到 HandleAbilityCancellation 的调用
+                if (codes[i].Calls(originalCancelMethod))
                 {
-                    // --- 修改 3: 调整栈数据，压入 pawn 参数 ---
-                    // 在调用补丁前，我们需要在栈上准备好 [Avatar, Job, Pawn]
-                    // 原本栈上已有 [Avatar, Job]，我们只需要在最后塞入一个 Pawn
-                    codes.Insert(i, new CodeInstruction(OpCodes.Ldarg_0));
-                    codes.Insert(i + 1, new CodeInstruction(OpCodes.Ldfld, ModCompatibility.PSE_PS_State_AvatarInstanceField));
+                    // 此时栈上是 [avatarInstance, curJob]
+                    // 我们将其替换为调用我们的包装方法
+                    codes[i] = new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PS_Avatar_ProcessMovement_Transpiler), nameof(Wrap_HandleAbilityCancellation)));
 
-                    // --- 修改 4: 替换原始调用 ---
-                    // 注意：由于 Insert 了两条指令，原本的 i 现在变成了 i+2
-                    codes[i + 2].opcode = OpCodes.Call;
-                    codes[i + 2].operand = replacement;
-
-                    // --- 修改 5: 大面积抹除 (Nop) ---
-                    // 从补丁调用之后，一直向后搜索，直到把 EndCurrentJob 也抹除掉
-                    for (int j = i + 3; j < codes.Count; j++)
+                    // 此时栈上剩下一个 bool (WrapHandleAbilityCancellation 的返回值)
+                    // 步骤 B: 寻找紧随其后的 EndCurrentJob 调用，并用 if(bool) 跳过它
+                    for (int j = i + 1; j < codes.Count; j++)
                     {
-                        var op = codes[j].opcode;
-                        var operand = codes[j].operand;
-
-                        // 记录当前指令，准备抹除
-                        codes[j].opcode = OpCodes.Nop;
-                        codes[j].operand = null;
-
-                        // 如果碰到了 EndCurrentJob 的调用，说明清理到头了
-                        if ((op == OpCodes.Callvirt || op == OpCodes.Call) && operand is MethodInfo m && m == endJobMethod)
+                        if (codes[j].Calls(endJobMethod))
                         {
-                            found = true;
+                            // 创建一个跳转标签，指向 EndCurrentJob 之后的那条指令
+                            Label labelAfterEndJob = generator.DefineLabel();
+                            codes[j + 1].labels.Add(labelAfterEndJob);
+
+                            // 在 i+1 处（即 Call 包装方法之后）插入跳转指令
+                            // 如果返回 true (在列表中)，则跳转到 EndCurrentJob 之后
+                            codes.Insert(i + 1, new CodeInstruction(OpCodes.Brtrue, labelAfterEndJob));
                             break;
                         }
                     }
-                    if (found) break;
                 }
             }
-            if (!found)
+            return codes;
+        }
+
+        public static IEnumerable<CodeInstruction> DoTranspile_RemoveInterruptDelay(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = instructions.ToList();
+            var avatarType = ModCompatibility.PSE_PS_AvatarType;
+            var durationField = AccessTools.Field(avatarType, "moveInputDuration");
+
+            if (durationField == null) return codes;
+
+            for (int i = 0; i < codes.Count; i++)
             {
-                Log.Message("[PerspectiveShiftExpanded] PS_Avatar_ProcessMovement_Transpiler_DoTranspile 未找到挂载点");
+                // 定位 moveInputDuration 的加载
+                if (codes[i].LoadsField(durationField))
+                {
+                    // 此时栈结构通常是：... && (!isOurWaitJob) [可能已经存入局部变量或还在栈上]
+                    // 然后开始判断 moveInputDuration > 0.35f
+
+                    // 我们寻找后续最近的一个比较跳转指令 (brfalse, ble, blt 等)
+                    // 这个跳转指令负责在 "moveInputDuration <= 0.35f" 时跳过 if 块内部
+                    for (int j = i + 1; j < i + 10 && j < codes.Count; j++)
+                    {
+                        // 如果找到了比较跳转指令
+                        if (codes[j].opcode == OpCodes.Ble || codes[j].opcode == OpCodes.Ble_S ||
+                            codes[j].opcode == OpCodes.Ble_Un || codes[j].opcode == OpCodes.Ble_Un_S ||
+                            codes[j].opcode == OpCodes.Brfalse || codes[j].opcode == OpCodes.Brfalse_S)
+                        {
+                            // 我们把从加载 moveInputDuration 到这个跳转指令之前的所有内容全部 Nop 掉
+                            // 并且把跳转指令本身也 Nop 掉
+                            // 这样 logic 就会“流向” if 块内部，不再受 0.35f 的约束
+
+                            int startIdx = i;
+                            // 如果前面有 ldarg.0 也一并处理
+                            if (i > 0 && codes[i - 1].opcode == OpCodes.Ldarg_0) startIdx = i - 1;
+
+                            for (int k = startIdx; k <= j; k++)
+                            {
+                                // 保留可能存在的标签，防止破坏其他地方跳过来的逻辑
+                                codes[k].opcode = OpCodes.Nop;
+                                codes[k].operand = null;
+                            }
+
+                            Log.Message("[PSE] 已物理移除 moveInputDuration 比较链条");
+                            return codes;
+                        }
+                    }
+                }
             }
             return codes;
         }

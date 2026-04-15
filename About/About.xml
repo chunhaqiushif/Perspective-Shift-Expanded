@@ -39,5 +39,6 @@
     <incompatibleWith>
         <li>addvans.wasdedpawn</li>
         <li>brrainz.cameraplus</li>
+        <li>himawari.moveWhileReloading</li>
     </incompatibleWith>
 </ModMetaData>

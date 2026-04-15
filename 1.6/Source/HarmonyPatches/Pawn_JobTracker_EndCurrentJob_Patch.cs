@@ -18,8 +18,6 @@ namespace PerspectiveShiftExpanded
     [HarmonyPatch(typeof(Pawn_JobTracker), nameof(Pawn_JobTracker.EndCurrentJob))]
     public static class Pawn_JobTracker_EndCurrentJob_Patch
     {
-
-
         public static void Prefix(Pawn_JobTracker __instance, out JobStateSnapshot __state)
         {
             __state = new JobStateSnapshot();
