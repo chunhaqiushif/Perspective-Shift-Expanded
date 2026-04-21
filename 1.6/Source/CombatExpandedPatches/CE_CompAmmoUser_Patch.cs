@@ -1,12 +1,8 @@
 ﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using RimWorld;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using UnityEngine;
 using Verse;
-using Verse.AI;
 
 // 当持有者为化身(Avatar)时,拦截除例外情况的所有换弹操作
 // 例外情况: 
@@ -23,17 +19,12 @@ namespace PerspectiveShiftExpanded
         {
             if (!ModCompatibility.CombatExpanded) { return; }
             if (!ModCompatibility.PerspectiveShift) { return; }
+
             if (ModCompatibility.PSE_CE_CompAmmoUser_TryStartReloadMethod == null) { return; }
 
-            MethodInfo myPrefix = AccessTools.Method(
-                typeof(CE_CompAmmoUser_TryStartReload_Patch),
-                nameof(CE_CompAmmoUser_TryStartReload_Patch.Prefix)
-                );
+            MethodInfo myPrefix = AccessTools.Method(typeof(CE_CompAmmoUser_TryStartReload_Patch), nameof(CE_CompAmmoUser_TryStartReload_Patch.Prefix));
 
-            Startup.harmony.Patch(
-                ModCompatibility.PSE_CE_CompAmmoUser_TryStartReloadMethod,
-                prefix: new HarmonyMethod(myPrefix)
-                );
+            Startup.harmony.Patch(ModCompatibility.PSE_CE_CompAmmoUser_TryStartReloadMethod, prefix: new HarmonyMethod(myPrefix));
 
             Log.Message("[PerspectiveShiftExpanded] 已成功挂载 CombatExtended.CE_CompAmmoUser.TryStartReload 的前置补丁");
         }
@@ -42,7 +33,6 @@ namespace PerspectiveShiftExpanded
 
     public static class CE_CompAmmoUser_TryStartReload_Patch
     {
-
         public static bool Prefix(object __instance)
         {
             if (__instance == null) { return true; }
@@ -52,17 +42,33 @@ namespace PerspectiveShiftExpanded
 
             if (ModCompatibility.PSE_PS_State_IsAvatar(holder))
             {
-                // 启用自动换弹意味着始终允许换弹,所以不进行拦截
-                if (PerspectiveShiftExpandedMod.settings.enableAvatarAutoReload)
+                int curMagCount = ModCompatibility.PSE_CE_GET_CompAmmoUser_CurMagCount(__instance);
+                //int magSize = ModCompatibility.PSE_CE_GET_CompAmmoUser_MagSize(__instance);
+
+                //// 拦截弹药全满时触发的换弹
+                //if (curMagCount == magSize)
+                //{
+                //    Log.Message("trystartreload: curMagCount == magSize");
+                //    string speechText = "弹药全满!不需要换弹!";
+                //    AvatarUtils.AvatarNotify(speechText, SoundDefOf.ClickReject);
+                //    return false;
+                //}
+
+                // 拦截空仓射击时触发的换弹
+                if (curMagCount == 0 && holder.Drafted == true && Input.GetMouseButton(0))
                 {
-                    return true;
+                    string speechText = "弹药耗尽!需要更换弹药!";
+                    AvatarUtils.AvatarNotify(speechText, SoundDefOf.ClickReject);
+                    return false;
                 }
 
-                // 允许换弹的临时开关,默认为false,当为true时允许换弹,并且在换弹操作后会被重置为false
-                if (AvatarFlag.isAllowAvatarToReload)
+                // UI点击换弹和Shift+R换弹的情况
+                if (AvatarUtils.isAllowAvatarToReload)
                 {
+                    if (!holder.Drafted) { holder.drafter.Drafted = true; }
                     return true;
                 }
+                // 拦截不允许换弹的其他情况(标识未开启的状况)
                 return false;
             }
             return true;
@@ -74,7 +80,11 @@ namespace PerspectiveShiftExpanded
     {
         static CE_CompAmmoUser_SyncedTryStartReload_HarmonyManualPatches()
         {
+            if (!ModCompatibility.CombatExpanded) { return; }
+            if (!ModCompatibility.PerspectiveShift) { return; }
+
             if (ModCompatibility.PSE_CE_CompAmmoUser_SyncedTryStartReloadMethod == null) { return; }
+
             MethodInfo myPrefix = AccessTools.Method(
                 typeof(CE_CompAmmoUser_SyncedTryStartReload_Patch),
                 nameof(CE_CompAmmoUser_SyncedTryStartReload_Patch.Prefix)
@@ -102,18 +112,16 @@ namespace PerspectiveShiftExpanded
     {
         public static void Prefix(object __instance)
         {
-            // 如果点击按钮的是 Avatar，开启临时允许标志
             Pawn holder = ModCompatibility.PSE_CE_GET_CompAmmoUser_Holder(__instance);
             if (holder != null && ModCompatibility.PSE_PS_State_IsAvatar(holder))
             {
-                AvatarFlag.isAllowAvatarToReload = true;
+                AvatarUtils.isAllowAvatarToReload = true;
             }
         }
 
         public static void Postfix(object __instance)
         {
-            // 执行完后立刻关掉，恢复拦截状态
-            AvatarFlag.isAllowAvatarToReload = false;
+            AvatarUtils.isAllowAvatarToReload = false;
         }
     }
 }

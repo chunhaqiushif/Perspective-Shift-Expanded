@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-    <PS_EnableJobsTimeSpeedUp>Enable do jobs time speed up</PS_EnableJobsTimeSpeedUp>
-    <PS_JobsTimeSpeedUpLevel>Jobs time speed: {0}x</PS_JobsTimeSpeedUpLevel>
-    <PS_EnableMineTimeSpeedUp>Mine</PS_EnableMineTimeSpeedUp>
-    <PS_EnablePlantTimeSpeedUp>Plant</PS_EnablePlantTimeSpeedUp>
-    <PS_EnableResearchTimeSpeedUp>Research</PS_EnableResearchTimeSpeedUp>
-    <PS_EnableDoBillTimeSpeedUp>Do bill</PS_EnableDoBillTimeSpeedUp>
-    <PS_EnableDoFrameAndRepairTimeSpeedUp>Do frame and repair</PS_EnableDoFrameAndRepairTimeSpeedUp>
-    <PS_EnableRestTimeSpeedUp>Rest</PS_EnableRestTimeSpeedUp>
-    <PS_EnableReadBookTimeSpeedUp>Read book</PS_EnableReadBookTimeSpeedUp>
-    <PS_EnableMeditatePrayTimeSpeedUp>Meditate Pray</PS_EnableMeditatePrayTimeSpeedUp>
+    <PSE_EnableJobsTimeSpeedUp>Enable do jobs time speed up</PSE_EnableJobsTimeSpeedUp>
+    <PSE_JobsTimeSpeedUpLevel>Jobs time speed: {0}x</PSE_JobsTimeSpeedUpLevel>
+    <PSE_EnableMineTimeSpeedUp>Mine</PSE_EnableMineTimeSpeedUp>
+    <PSE_EnablePlantTimeSpeedUp>Plant</PSE_EnablePlantTimeSpeedUp>
+    <PSE_EnableResearchTimeSpeedUp>Research</PSE_EnableResearchTimeSpeedUp>
+    <PSE_EnableDoBillTimeSpeedUp>Do bill</PSE_EnableDoBillTimeSpeedUp>
+    <PSE_EnableDoFrameAndRepairTimeSpeedUp>Do frame and repair</PSE_EnableDoFrameAndRepairTimeSpeedUp>
+    <PSE_EnableRestTimeSpeedUp>Rest</PSE_EnableRestTimeSpeedUp>
+    <PSE_EnableReadBookTimeSpeedUp>Read book</PSE_EnableReadBookTimeSpeedUp>
+    <PSE_EnableMeditatePrayTimeSpeedUp>Meditate Pray</PSE_EnableMeditatePrayTimeSpeedUp>
+    <PSE_EnableRepairMechTimeSpeedUp>Repair Mech</PSE_EnableRepairMechTimeSpeedUp>
+    <PSE_EnableGroupActivitiesTimeSpeedUp>Group Activities</PSE_EnableGroupActivitiesTimeSpeedUp>
+
+    <PSE_ReloadTickPerMoveAdjustmentConstant>Move Adjustment Constant When Reload: {0}</PSE_ReloadTickPerMoveAdjustmentConstant>
+
+    <PSE_DisableNeeds>Disable Needs</PSE_DisableNeeds>
+    <PSE_DisableNeedMood>Mood</PSE_DisableNeedMood>
+    <PSE_DisableNeedFood>Food</PSE_DisableNeedFood>
+    <PSE_DisableNeedRest>Rest</PSE_DisableNeedRest>
+    <PSE_DisableNeedJoy>Joy</PSE_DisableNeedJoy>
+    <PSE_DisableNeedIndoor>Indoor</PSE_DisableNeedIndoor>
+    <PSE_DisableNeedOutdoor>Outdoor</PSE_DisableNeedOutdoor>
+    <PSE_DisableNeedBeauty>Beauty</PSE_DisableNeedBeauty>
+    <PSE_DisableNeedComfort>Comfort</PSE_DisableNeedComfort>
+    <PSE_DisableNeedRoomSize>Room size</PSE_DisableNeedRoomSize>
+    <PSE_DisableNeedDrugDesire>Drug Desire</PSE_DisableNeedDrugDesire>
+    <PSE_DisableMentalBreakStates>Disable Mental Break States</PSE_DisableMentalBreakStates>
 </LanguageData>

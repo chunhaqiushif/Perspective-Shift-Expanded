@@ -57,7 +57,8 @@ namespace PerspectiveShiftExpanded
         {
             if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused) { return; }
 
-            if (!(Event.current.type == EventType.KeyDown && Event.current.shift
+            if (!(Event.current.type == EventType.KeyDown
+                && Event.current.shift
                 && DefsOf.PSE_CE_AvatarReload.KeyDownEvent))
             { return; }
 
@@ -67,25 +68,34 @@ namespace PerspectiveShiftExpanded
             bool pawn_PassedOut = ModCompatibility.PSE_PS_GET_State_Avatar_PassedOut();
             if (pawn.Downed || pawn.InMentalState || pawn_PassedOut) return;
 
-            var comps = pawn.equipment.Primary.AllComps;
             ThingComp comp_tryStartReload = null;
-            foreach (var comp in comps)
+            var comps = pawn?.equipment?.Primary?.AllComps;
+
+            if (comps != null)
             {
-                if (comp.GetType() == ModCompatibility.PSE_CE_CompAmmoUserType)
+                foreach (var comp in comps)
                 {
-                    comp_tryStartReload = comp;
-                    break;
+                    if (comp.GetType() == ModCompatibility.PSE_CE_CompAmmoUserType)
+                    {
+                        comp_tryStartReload = comp;
+                        break;
+                    }
                 }
             }
-
-            if (comp_tryStartReload != null)
+            // 弓箭等没有弹药的武器, 也会有CompAmmoUser, 但是MagSize为0
+            if (comp_tryStartReload == null || ModCompatibility.PSE_CE_GET_CompAmmoUser_MagSize(comp_tryStartReload) <= 0)
             {
-                AvatarFlag.isAllowAvatarToReload = true;
-                ModCompatibility.PSE_CE_CompAmmoUser_TryStartReload(comp_tryStartReload);
-                AvatarFlag.isAllowAvatarToReload = false;
-                Event.current.Use();    // 消耗掉事件，跳过后续事件(默认按键R为征召)
-                return;
+                string speechText = "换弹? 换什么弹? 给什么换弹?";
+                AvatarUtils.AvatarNotify(speechText, SoundDefOf.ClickReject);
             }
+            else
+            {
+                AvatarUtils.isAllowAvatarToReload = true;
+                ModCompatibility.PSE_CE_CompAmmoUser_TryStartReload(comp_tryStartReload);
+                AvatarUtils.isAllowAvatarToReload = false;
+            }
+
+            Event.current.Use();    // 消耗掉事件，跳过后续事件(默认按键R为征召)
             return;
         }
 
@@ -105,13 +115,14 @@ namespace PerspectiveShiftExpanded
             List<Thing> booksInInventory = new List<Thing>();
             foreach (Thing item in pawn.inventory.innerContainer)
             {
-                if (item.def.defName.Contains("Tome") | item.def.defName.Contains("TextBook"))
+                if (item is Book)
                 {
                     booksInInventory.Add(item);
                 }
             }
             if (booksInInventory.Count == 0)
             {
+                AvatarUtils.AvatarNotify($"背包里无书可读...", SoundDefOf.CancelMode);
                 return;
             }
             int randomIndex = Rand.Range(0, booksInInventory.Count);
@@ -123,16 +134,19 @@ namespace PerspectiveShiftExpanded
 
         private static void HandleSelectAvatarBindings()
         {
-            if (!DefsOf.PSE_SelectAvatar.KeyDownEvent)
+            if (Event.current.type != EventType.KeyDown) { return; }
+
+            if (DefsOf.PSE_SelectAvatar.KeyDownEvent) 
             {
-                return;
-            }
-            Pawn pawn = ModCompatibility.PSE_PS_GET_State_Avatar_Pawn();
-            if (pawn != null && pawn.Spawned)
-            {
-                Find.Selector.ClearSelection();
-                Find.Selector.Select(pawn);
-                CameraJumper.TryJump(pawn);
+                Pawn pawn = ModCompatibility.PSE_PS_GET_State_Avatar_Pawn();
+                if (pawn != null && pawn.Spawned)
+                {
+                    if (Find.Selector.SingleSelectedThing == pawn) { return; }
+
+                    Find.Selector.ClearSelection();
+                    Find.Selector.Select(pawn);
+                    ModCompatibility.PSE_PS_State_Avatar_UpdateCamera();
+                }
             }
         }
     }
@@ -143,7 +157,6 @@ namespace PerspectiveShiftExpanded
         static PS_Avatar_ProcessMovement_HarmonyManualPatches()
         {
             if (ModCompatibility.PSE_PS_Avatar_ProcessMovementMethod == null) { return; }
-            // 需要兼容CE
             if (!ModCompatibility.CombatExpanded) { return; }
 
             MethodInfo myTranspiler = AccessTools.Method(
@@ -175,25 +188,20 @@ namespace PerspectiveShiftExpanded
             ModCompatibility.PSE_CE_GET_CE_JobDefOf_ReloadWeapon(),
         };
 
-        // 逻辑：如果 RunAndGun 激活，或者是我们列表中的 Job，则返回 true
         public static bool Wrap_HandleAbilityCancellation(object avatarInstance, Job curJob)
         {
-            // 1. 获取 pawn 实例
-            // 假设通过其一中的结构，avatarInstance 内部有 pawn 字段
             var pawnField = AccessTools.Field(avatarInstance.GetType(), "pawn");
             Pawn pawn = pawnField?.GetValue(avatarInstance) as Pawn;
-            // 2. 判断是否在免中断列表中
+
             if (pawn != null && curJob != null && PreventInterruptJobs.Contains(curJob.def))
             {
                 return true; // 触发拦截
             }
 
-            // 3. 否则执行原有的 HandleAbilityCancellation
-            // 使用反射调用其三中的私有方法
             var originalMethod = AccessTools.Method(avatarInstance.GetType(), "HandleAbilityCancellation", new[] { typeof(Job) });
             originalMethod?.Invoke(avatarInstance, new object[] { curJob });
 
-            return false; // 继续执行后续逻辑（即 EndCurrentJob）
+            return false;
         }
 
         public static IEnumerable<CodeInstruction> DoTranspile_PreventInterruptJobs(IEnumerable<CodeInstruction> instructions, ILGenerator generator)

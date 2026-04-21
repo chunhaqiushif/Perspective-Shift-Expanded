@@ -1,12 +1,9 @@
 ﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 using Verse;
 using Verse.AI;
 
-// 当角色为化身(Avatar)时，跳过 CE 的原始检查逻辑，避免玩家角色进入自动换弹
+// 当角色为化身(Avatar)时，跳过 CE 的原始检查逻辑，避免玩家角色进入[自动换弹]
 // ModCompatibility: CE
 
 namespace PerspectiveShiftExpanded
