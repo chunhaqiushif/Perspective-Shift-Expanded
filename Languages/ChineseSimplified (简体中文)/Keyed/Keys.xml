@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+    <PSE_EnableJobsTimeSpeedUp>启用工作速度加快</PSE_EnableJobsTimeSpeedUp>
+    <PSE_JobsTimeSpeedUpLevel>工作速度倍率：{0}x</PSE_JobsTimeSpeedUpLevel>
+    <PSE_EnableMineTimeSpeedUp>采矿</PSE_EnableMineTimeSpeedUp>
+    <PSE_EnablePlantTimeSpeedUp>种植</PSE_EnablePlantTimeSpeedUp>
+    <PSE_EnableResearchTimeSpeedUp>研究</PSE_EnableResearchTimeSpeedUp>
+    <PSE_EnableDoBillTimeSpeedUp>制作</PSE_EnableDoBillTimeSpeedUp>
+    <PSE_EnableDoFrameAndRepairTimeSpeedUp>建造与修理</PSE_EnableDoFrameAndRepairTimeSpeedUp>
+    <PSE_EnableRestTimeSpeedUp>休息</PSE_EnableRestTimeSpeedUp>
+    <PSE_EnableReadBookTimeSpeedUp>阅读</PSE_EnableReadBookTimeSpeedUp>
+    <PSE_EnableMeditatePrayTimeSpeedUp>冥想/祈祷</PSE_EnableMeditatePrayTimeSpeedUp>
+    <PSE_EnableRepairMechTimeSpeedUp>修理机械体</PSE_EnableRepairMechTimeSpeedUp>
+    <PSE_EnableGroupActivitiesTimeSpeedUp>集体活动</PSE_EnableGroupActivitiesTimeSpeedUp>
+
+    <PSE_ReloadTickPerMoveAdjustmentConstant>重新装填时移动调整常数：{0}</PSE_ReloadTickPerMoveAdjustmentConstant>
+
+    <PSE_DisableNeeds>禁用需求</PSE_DisableNeeds>
+    <PSE_DisableNeedMood>心情</PSE_DisableNeedMood>
+    <PSE_DisableNeedFood>食物</PSE_DisableNeedFood>
+    <PSE_DisableNeedRest>休息</PSE_DisableNeedRest>
+    <PSE_DisableNeedJoy>娱乐</PSE_DisableNeedJoy>
+    <PSE_DisableNeedIndoor>室内</PSE_DisableNeedIndoor>
+    <PSE_DisableNeedOutdoor>户外</PSE_DisableNeedOutdoor>
+    <PSE_DisableNeedBeauty>美观</PSE_DisableNeedBeauty>
+    <PSE_DisableNeedComfort>舒适</PSE_DisableNeedComfort>
+    <PSE_DisableNeedRoomSize>房间大小</PSE_DisableNeedRoomSize>
+    <PSE_DisableNeedDrugDesire>成瘾品渴望</PSE_DisableNeedDrugDesire>
+    <PSE_DisableMentalBreakStates>禁用精神崩溃状态</PSE_DisableMentalBreakStates>
+</LanguageData>
